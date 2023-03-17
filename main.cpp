@@ -21,6 +21,9 @@ public:
 
     std::thread& get() { return t; }
 
+    ThreadRAII (ThreadRAII&&) = default;
+    ThreadRAII& operator=(ThreadRAII&&) = default;
+
 private:
     DtorAction action;
     std::thread t;
@@ -43,10 +46,10 @@ bool doWork(std::function<bool(int)> filter,
         }
     }), ThreadRAII::DtorAction::join);
 
-    auto nh = t.native_handle();
+    auto nh = t.get().native_handle();
 
     if (conditionsAreSatisfied()) {
-        t.join();
+        t.get().join();
         return true;
     } else {
         return false;
@@ -54,6 +57,5 @@ bool doWork(std::function<bool(int)> filter,
 }
 
 int main() {
-
     return 0;
 }
